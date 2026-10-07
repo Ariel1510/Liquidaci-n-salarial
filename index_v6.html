@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Liquidación Laboral El Salvador</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#eef8f9;--card:#fff;--tx:#2b3a3f;--mut:#65787d;--dk:#1b6f7a;--tl:#26bcc4;--bd:#d5eaec;--sh:0 8px 28px rgba(27,111,122,.15);--hero:#dff3f5;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1c1f;--card:#172a2e;--tx:#e6f3f4;--mut:#93b0b4;--dk:#5fd3db;--tl:#146e75;--bd:#24444a;--sh:0 8px 28px rgba(0,0,0,.4);--hero:#12272b}}
+:root[data-theme="dark"]{--bg:#0f1c1f;--card:#172a2e;--tx:#e6f3f4;--mut:#93b0b4;--dk:#5fd3db;--tl:#146e75;--bd:#24444a;--sh:0 8px 28px rgba(0,0,0,.4);--hero:#12272b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Poppins,system-ui,sans-serif;line-height:1.5}
+h1,h2{font-family:Lora,Georgia,serif;color:var(--dk);margin:0}
+.hero{background:linear-gradient(180deg,var(--hero),var(--bg));text-align:center;padding:34px 18px 90px}
+.hero h1{font-size:clamp(1.7rem,5.5vw,2.6rem);line-height:1.15;text-transform:uppercase}
+.hero p{color:var(--mut);margin:8px auto 0;max-width:520px}
+.wrap{max-width:820px;margin:0 auto;padding:0 16px}
+.card{background:var(--card);border-radius:22px;box-shadow:var(--sh);padding:22px;margin-bottom:16px}
+.first{margin-top:-64px;position:relative}
+.card h2{font-size:1.25rem;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+label.l{display:block;font-size:.8rem;color:var(--mut);margin-bottom:4px}
+input[type=text],input[type=number],input[type=date],select{width:100%;padding:10px 12px;border:2px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx);font:inherit}
+input:focus,select:focus{outline:none;border-color:var(--tl)}
+input:disabled{opacity:.6}
+.q{margin:14px 0 6px;font-weight:600;font-size:.92rem}
+.opts label{display:inline-flex;align-items:center;gap:6px;margin:0 16px 4px 0;font-size:.92rem;cursor:pointer}
+input[type=radio],input[type=checkbox]{accent-color:var(--tl);width:17px;height:17px}
+.sub{margin-top:10px;padding:12px;border-left:3px solid var(--tl);background:var(--bg);border-radius:0 12px 12px 0}
+.warn{color:#c2410c;font-size:.85rem;margin:8px 0 0}
+.chk{display:grid;gap:6px;max-height:320px;overflow:auto}
+.chk label{display:flex;gap:8px;align-items:center;font-size:.88rem}
+.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;max-width:320px}
+.ch button{border:0;background:var(--tl);color:#fff;border-radius:50%;width:30px;height:30px;font-size:1.1rem;cursor:pointer}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;max-width:320px}
+.cg i{font-style:normal;text-align:center;font-size:.72rem;color:var(--mut)}
+.cg button{border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:7px 0;cursor:pointer;font:inherit;font-size:.85rem}
+.cg button.on{background:var(--tl);color:#fff;border-color:var(--tl)}
+.cg button:disabled{opacity:.3;cursor:default}
+.ch select{width:auto;padding:4px 8px;border-radius:8px;font-size:.85rem}
+.ch .sel{display:flex;gap:6px}
+.chk .head{margin-top:6px}
+/* Botones de acción (calcular, descargar, volver...) */
+.acts{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:16px 0 8px}
+.acts .btn{margin:0}
+.btn.alt{background:transparent;color:var(--dk);border:2px solid var(--dk)}
+/* Ventana flotante de resultados */
+.ov{position:fixed;inset:0;background:rgba(10,25,28,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal{background:var(--card);border-radius:22px;box-shadow:var(--sh);width:100%;max-width:640px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.modal header{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--bd)}
+.modal header h2{font-size:1.2rem}
+.modal header button{border:0;background:transparent;color:var(--mut);font-size:1.6rem;line-height:1;cursor:pointer}
+.modal .body{padding:6px 22px 12px;overflow:auto}
+.modal footer{padding:12px 22px 16px;border-top:1px solid var(--bd)}
+.modal footer .acts{margin:0}
+.row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd);font-size:.9rem}
+.row small{display:block;color:var(--mut);font-size:.75rem}
+.row b{white-space:nowrap;color:var(--dk)}
+.row.neg b{color:#c2410c}
+.total{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:13px 18px;border-radius:14px;background:var(--tl);color:#fff;font-weight:600}
+.total span:last-child{font-family:Lora,Georgia,serif;font-size:1.4rem}
+.total.net{background:var(--dk)}
+:root:not([data-theme="light"]) .total.net{color:#0f1c1f}
+.note{font-size:.75rem;color:var(--mut);margin:10px 0 0}
+.btn{display:block;margin:16px auto 0;background:var(--dk);color:#fff;border:0;border-radius:30px;padding:12px 30px;font:600 .9rem Poppins,sans-serif;letter-spacing:.04em;cursor:pointer}
+.head{font-weight:600;color:var(--dk);margin-top:10px;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- ===================== PÁGINA 1: FORMULARIO ===================== -->
+<div id="vistaForm">
+<header class="hero"><h1>Liquidación laboral</h1><p>Despido injustificado o renuncia voluntaria · Código de Trabajo de El Salvador</p></header>
+
+<div class="wrap">
+
+<!-- 1. DATOS GENERALES -->
+<section class="card first">
+<h2>1. Datos generales</h2>
+<div class="grid">
+<div><label class="l">Nombre (solo letras)</label><input type="text" id="nom" maxlength="80" autocomplete="name" placeholder="Nombre completo"></div>
+<div><label class="l">DUI (solo números)</label><input type="text" id="dui" inputmode="numeric" autocomplete="off" placeholder="00000000-0"></div>
+<div><label class="l">Cargo</label><input type="text" id="car" maxlength="60" placeholder="Ej. Cajero"></div>
+<div><label class="l">Último salario mensual comprobado (USD)</label><input type="text" id="sal" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
+</div>
+<p class="note">Los campos vacíos se mostrarán como xxxxxxxxxxxxxxxx en el resultado.</p>
+</section>
+
+<!-- 2. TIPO DE TERMINACIÓN Y FECHAS -->
+<section class="card">
+<h2>2. Tipo de terminación y fechas</h2>
+<div class="q">¿Cómo terminó la relación laboral?</div>
+<div class="opts"><label><input type="radio" name="tipo" value="despido" checked> Despido injustificado</label><label><input type="radio" name="tipo" value="renuncia"> Renuncia voluntaria</label></div>
+<div id="avBox" class="sub" hidden>
+<div class="q" style="margin-top:0">¿El trabajador dio preaviso?</div>
+<div class="opts"><label><input type="radio" name="aviso" value="si" checked> Sí avisó</label><label><input type="radio" name="aviso" value="no"> No avisó</label></div>
+<p class="note" id="topeBox">Tope salarial de la prestación: 4 × salario mínimo de comercio (<span id="topeTxt"></span>).</p>
+<p class="warn" id="avWarn" hidden>Sin preaviso no hay derecho a la prestación por renuncia: la fórmula queda bloqueada.</p>
+</div>
+<div class="grid" style="margin-top:14px">
+<div><label class="l">Fecha de inicio</label><input type="date" id="ini"></div>
+<div><label class="l" id="finL">Fecha final</label><input type="date" id="fin"></div>
+</div>
+</section>
+
+<!-- 3. ASUETOS TRABAJADOS (solo 2026) -->
+<section class="card">
+<h2>3. Asuetos trabajados</h2>
+<div class="q" style="margin-top:0">¿Trabajó en días de asueto?</div>
+<div class="opts"><label><input type="radio" name="asu" value="si"> Sí</label><label><input type="radio" name="asu" value="no" checked> No</label></div>
+<div id="asuBox" class="sub" hidden><label class="l">Asuetos del año actual (San Miguel) · marca los trabajados</label><div class="chk" id="asuList"></div></div>
+</section>
+
+<!-- 4. DESCANSOS TRABAJADOS Y NO PAGADOS (sin límite) -->
+<section class="card">
+<h2>4. Descansos semanales trabajados y no pagados</h2>
+<div class="q" style="margin-top:0">¿Trabajó días de descanso sin pago?</div>
+<div class="opts"><label><input type="radio" name="des" value="si"> Sí</label><label><input type="radio" name="des" value="no" checked> No</label></div>
+<div id="desBox" class="sub" hidden><label class="l">Selecciona en el calendario los días trabajados (sin límite · solo del año actual)</label><div id="calDes"></div><p class="note" id="desSel"></p></div>
+</section>
+
+<!-- 5. VACACIONES -->
+<section class="card">
+<h2>5. Vacaciones</h2>
+<div class="q" style="margin-top:0">¿Ya recibió sus vacaciones?</div>
+<div class="opts"><label><input type="radio" name="vac" value="si" checked> Sí</label><label><input type="radio" name="vac" value="no"> No</label></div>
+<div id="vacSiBox" class="sub" hidden><label class="l">Selecciona en el calendario los días de vacaciones que disfrutó (solo del año actual)</label><div id="calVac"></div><p class="note" id="vacSel"></p></div>
+<div id="vacNoBox" class="sub" hidden>
+<div class="q" style="margin-top:0">¿Le dieron alojamiento?</div>
+<div class="opts"><label><input type="radio" name="aloj" value="si"> Sí</label><label><input type="radio" name="aloj" value="no" checked> No</label></div>
+<div class="q">¿Le dieron comida?</div>
+<div class="opts"><label><input type="radio" name="com" value="si"> Sí</label><label><input type="radio" name="com" value="no" checked> No</label></div>
+</div>
+</section>
+
+<!-- 6. AGUINALDO -->
+<section class="card">
+<h2>6. Aguinaldo</h2>
+<p class="note" style="margin:0">Fecha de pago de referencia: 2 de octubre. Si la fecha final es anterior, el aguinaldo se considera no pagado y se calcula proporcional; si es igual o posterior, se considera pagado.</p>
+</section>
+
+<div class="acts" style="margin-bottom:40px"><button class="btn" id="btnCalc" type="button">CALCULAR LIQUIDACIÓN</button></div>
+</div>
+</div>
+
+<!-- ===================== PÁGINA 2: RESULTADOS ===================== -->
+<div id="vistaRes" hidden>
+<header class="hero"><h1>Resultado de la liquidación</h1><p>Revisa el detalle y descárgalo en PDF si lo necesitas</p></header>
+<div class="wrap">
+<div class="card first" id="resPage"></div>
+<div class="acts" style="margin-bottom:40px">
+<button class="btn btnPdf" type="button">DESCARGAR PDF</button>
+<button class="btn alt" id="btnVolver" type="button">VOLVER A EDITAR</button>
+</div>
+</div>
+</div>
+
+<!-- ===================== VENTANA FLOTANTE DE RESULTADOS ===================== -->
+<div class="ov" id="ov" hidden>
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalT">
+<header><h2 id="modalT">Resultado de la liquidación</h2><button type="button" id="btnX" aria-label="Cerrar">×</button></header>
+<div class="body" id="resModal"></div>
+<footer><div class="acts">
+<button class="btn btnPdf" type="button">DESCARGAR PDF</button>
+<button class="btn alt" id="btnPagina" type="button">VER EN PÁGINA APARTE</button>
+<button class="btn alt" id="btnCerrar" type="button">SOLO VER (CERRAR)</button>
+</div></footer>
+</div>
+</div>
+
+<script>
+/* ==========================================================================
+   ÍNDICE DE FÓRMULAS  (documentación para quien revise el código)
+   Cada fórmula está numerada y se repite con el mismo número, justo encima de la línea
+   de código donde se calcula, con esta estructura:
+       #Fórmula N: Nombre de la fórmula: valor (qué es) × valor (qué es) ...
+   Abreviaturas:  SBD = Salario Básico Diario (salario mensual ÷ 30)
+                  Salario tope = menor entre el salario real y 4 × salario mínimo de comercio
+
+   #Fórmula 1:  Días de servicio (método 30/360): (años × 360) + (meses × 30) + días + 1
+   #Fórmula 2:  Años de servicio: años completos, días sobrantes y años con decimales
+   #Fórmula 3:  Salario básico diario (SBD): salario mensual ÷ 30
+   #Fórmula 4:  Salario tope: mínimo entre el salario real y (4 × salario mínimo de comercio)
+   #Fórmula 5:  Indemnización por despido injustificado: salario tope × años con decimales (mínimo: salario tope ÷ 2)
+   #Fórmula 6:  Prestación por renuncia voluntaria: (salario tope ÷ 30) × 15 días × años con decimales
+   #Fórmula 7:  Fracción de vacaciones: días sobrantes ÷ 360 (si ya las recibió) / 1 + días sobrantes ÷ 360 (si no)
+   #Fórmula 8:  Pago de vacaciones: SBD × 15 días × fracción de vacaciones × 1.30
+   #Fórmula 9:  Recargo por alojamiento: SBD × 15 días × fracción de vacaciones × 0.25
+   #Fórmula 10: Recargo por alimentación: SBD × 15 días × fracción de vacaciones × 0.25
+   #Fórmula 11: Días de aguinaldo según antigüedad: menos de 3 años = 15 · de 3 a 10 años = 19 · más de 10 años = 21
+   #Fórmula 12: Aguinaldo proporcional: SBD × días de aguinaldo ÷ 360 × días transcurridos
+   #Fórmula 13: Pago de asuetos trabajados: SBD × 2 × cantidad de asuetos trabajados
+   #Fórmula 14: Pago de descansos trabajados: SBD × 1.5 × cantidad de descansos trabajados
+   #Fórmula 15: Total bruto: suma de todos los conceptos anteriores
+   #Fórmula 16: Descuento ISSS: mínimo(total bruto, $1,000) × 3 %
+   #Fórmula 17: Descuento AFP: total bruto × 7.25 %
+   #Fórmula 18: Total neto a recibir: total bruto − ISSS − AFP
+   #Fórmula 19: Fechas de Semana Santa: Domingo de Pascua − 3 / − 2 / − 1 días
+   ========================================================================== */
+
+/* ==========================================================================
+   CONSTANTES LEGALES  (si cambia la ley, solo se modifican aquí)
+   Son los números "fijos" que usan las fórmulas más abajo. Están juntos
+   para que, si cambia un monto o un porcentaje, se corrija en un solo lugar
+   y todas las fórmulas se actualicen solas.
+   ========================================================================== */
+
+// Salario mínimo MENSUAL del sector comercio (USD).
+//  · Para qué sirve: es la referencia del tope legal. El salario que se usa para calcular la
+//    indemnización (despido) o la prestación (renuncia) nunca puede pasar de 4 veces este monto.
+//  · Ya no es un campo que se escriba en la página; si el salario mínimo sube, se cambia aquí.
+const SALARIO_MIN_COMERCIO = 408.80;
+
+// Cuántas veces el salario mínimo es el tope (4).
+//  · Tope en dinero = 4 × 408.80 = $1,635.20. Quien gana más que eso, se calcula como si ganara $1,635.20.
+const TOPE_VECES_MINIMO = 4;
+
+// Deducciones de ley que se le descuentan al total:
+//  · ISSS (seguro social): 3 % del total, pero el total solo cuenta hasta $1,000 (ISSS_TOPE).
+//  · AFP (pensiones): 7.25 % del total completo, sin tope.
+const ISSS_TOPE = 1000;
+const ISSS_TASA = 0.03;     // ISSS laboral: 3 %
+const AFP_TASA  = 0.0725;   // AFP laboral: 7.25 %
+
+/* ==========================================================================
+   ASUETOS (San Miguel) - SOLO DEL AÑO ACTUAL
+   Los asuetos que se ofrecen en la página son únicamente los del año en que
+   estamos (el año que marca el reloj de la computadora/celular). No se muestran
+   asuetos de años anteriores ni posteriores.
+   ========================================================================== */
+const ANIO_ACTUAL = new Date().getFullYear();
+
+/* ---------- Domingo de Pascua (algoritmo de Meeus/Jones/Butcher) ----------
+   ¿Qué es?  La fecha del Domingo de Pascua de un año.
+   ¿Para qué sirve?  Jueves, Viernes y Sábado Santo NO caen en la misma fecha cada año:
+     se mueven según la Pascua. Para saber en qué día caen este año, primero hay que saber
+     cuándo es la Pascua.
+   ¿Cómo se obtiene?  La Pascua es el primer domingo después de la primera luna llena de la
+     primavera. Como eso es astronomía, existe una fórmula matemática (Meeus/Jones/Butcher)
+     que, con puro cálculo de residuos (%) y divisiones enteras, entrega el mes y el día.
+     No hace falta entender cada letra (a, b, c...): son pasos intermedios del algoritmo.
+   Ejemplo: easter(2026) = 5 de abril de 2026. */
+function easter(y) {
+  const a = y % 19, b = Math.floor(y / 100), c = y % 100,
+        d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25),
+        g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30,
+        i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7,
+        mm = Math.floor((a + 11 * h + 22 * l) / 451),
+        mo = Math.floor((h + l - 7 * mm + 114) / 31),
+        da = ((h + l - 7 * mm + 114) % 31) + 1;
+  return new Date(y, mo - 1, da);
+}
+
+/* ---------- Lista de asuetos de un año ----------
+   ¿Qué es?  La lista de [fecha, nombre] de los días de asueto de un año.
+   ¿Para qué sirve?  Es la lista que se le muestra al usuario para marcar cuáles asuetos
+     trabajó, y también sirve para detectar si un día de descanso coincide con un asueto.
+   ¿Cómo se obtiene?
+     · Asuetos de fecha fija (Año Nuevo, 1 de mayo, 15 de septiembre, Navidad...): se arma la
+       fecha con el año, por ejemplo `${y}-05-01`.
+     · Semana Santa (fecha móvil): se parte del Domingo de Pascua y se resta:
+         Jueves Santo = Pascua − 3 días · Viernes Santo = Pascua − 2 · Sábado Santo = Pascua − 1
+       Ejemplo 2026: Pascua = 5 abr → Jueves Santo = 2 abr, Viernes = 3 abr, Sábado = 4 abr.
+     · El resultado se guarda en memoria (_cacheAsu) para no recalcularlo cada vez. */
+const _cacheAsu = {};
+function asuetos(y) {
+  if (_cacheAsu[y]) return _cacheAsu[y];
+  const E = easter(y);
+  // #Fórmula 19: Fechas de Semana Santa: Domingo de Pascua (E) − 3 días = Jueves Santo · − 2 días = Viernes Santo · − 1 día = Sábado Santo
+  //   (sh(n) = la fecha de la Pascua desplazada n días; n negativo = días antes de la Pascua)
+  const sh = n => iso(new Date(E.getFullYear(), E.getMonth(), E.getDate() + n));
+  return _cacheAsu[y] = [
+    [`${y}-01-01`, 'Año Nuevo'],
+    [sh(-3), 'Jueves Santo'],
+    [sh(-2), 'Viernes Santo'],
+    [sh(-1), 'Sábado Santo'],
+    [`${y}-05-01`, 'Día del Trabajo'],
+    [`${y}-05-10`, 'Día de la Madre'],
+    [`${y}-06-17`, 'Día del Padre'],
+    [`${y}-08-06`, 'Divino Salvador del Mundo'],
+    [`${y}-09-15`, 'Independencia'],
+    [`${y}-11-02`, 'Día de los Difuntos'],
+    [`${y}-11-21`, 'Fiesta patronal San Miguel (Virgen de la Paz)'],
+    [`${y}-12-25`, 'Navidad']
+  ];
+}
+/* ---------- ¿Esta fecha es un asueto? ----------
+   ¿Para qué sirve?  Para NO pagar doble: si el trabajador marcó como "descanso trabajado" un
+     día que además es asueto, ese día se paga una sola vez (como asueto), no dos veces.
+   ¿Cómo funciona?  Devuelve verdadero solo si la fecha es del año actual y está en la lista de
+     asuetos de ese año. */
+const esAsueto = f => pd(f).y === ANIO_ACTUAL && asuetos(ANIO_ACTUAL).some(a => a[0] === f);
+
+/* ==========================================================================
+   UTILIDADES
+   ========================================================================== */
+const $ = id => document.getElementById(id);
+const X = 'xxxxxxxxxxxxxxxx';   // texto que sustituye a los campos vacíos
+
+// Da formato de dinero: 1234.5 -> "$1,234.50"
+const m = n => '$' + (Math.round(n * 100) / 100).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+// Valor del radio seleccionado de un grupo (por su atributo name)
+const rv = n => document.querySelector(`input[name=${n}]:checked`).value;
+
+// "2026-03-15" -> {y:2026, m:3, d:15}
+const pd = s => { const [a, b, c] = s.split('-').map(Number); return {y: a, m: b, d: c}; };
+
+// Date -> "YYYY-MM-DD" (formato que usan los <input type=date> y los Set de fechas)
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+// "2026-03-15" -> "15/03/2026" (para mostrar al usuario)
+const dmy = s => { const p = pd(s); return `${String(p.d).padStart(2, '0')}/${String(p.m).padStart(2, '0')}/${p.y}`; };
+
+const TODAY = iso(new Date());
+const MN = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+/* ---------- Días entre dos fechas (método comercial 30/360) ----------
+   ¿Qué es?  La cantidad de días que hay entre dos fechas, contando como si todos los meses
+     tuvieran 30 días y el año tuviera 360.
+   ¿Para qué sirve?  Es la base de TODA la liquidación: de aquí salen los años trabajados
+     (indemnización/prestación), los días sobrantes (vacaciones) y los días del aguinaldo.
+     Se usa 30/360 porque así lo hace el cálculo laboral (mes = 30 días), y evita diferencias
+     por meses de 28, 29 o 31 días.
+   ¿Cómo se obtiene?
+       días = (años de diferencia × 360) + (meses de diferencia × 30) + (días de diferencia) + 1
+     · El "+ 1" cuenta también el día de inicio (el primer día trabajado cuenta).
+     · Para que todos los meses midan 30: si la fecha de inicio cae en día 31 se cuenta como 30;
+       y si la fecha final cae en día 31 se cuenta como 30 solo cuando el inicio es día 30 o 31
+       (es la regla estándar del método 30/360).
+   Ejemplos:
+     01/01/2024 al 30/12/2024 → 0×360 + 11×30 + (30−1) + 1 = 360 días = 1 año exacto.
+     15/03/2022 al 20/10/2026 → 4×360 + 7×30 + 5 + 1 = 1,656 días. */
+// #Fórmula 1: Días de servicio (método 30/360): (diferencia de años × 360) + (diferencia de meses × 30) + (diferencia de días) + 1 (cuenta el día de inicio)
+function d360(a, b) {
+  const A = pd(a), B = pd(b);
+  const d1 = A.d == 31 ? 30 : A.d;
+  const d2 = (B.d == 31 && d1 == 30) ? 30 : B.d;
+  return (B.y - A.y) * 360 + (B.m - A.m) * 30 + (d2 - d1) + 1;
+}
+
+/* ==========================================================================
+   ESTADO
+   ========================================================================== */
+const A = new Set();   // asuetos del año actual marcados como trabajados
+const D = new Set();   // días de descanso trabajados y no pagados (sin límite)
+const V = new Set();   // días de vacaciones disfrutados (informativo)
+let R = null;          // último resultado calculado (lo usa el PDF)
+
+// ¿La fecha d cae dentro del período inicio–fin? (se usa para limitar los calendarios)
+const rng = () => [$('ini').value, $('fin').value];
+const inR = d => { const [s, e] = rng(); return (!s || d >= s) && (!e || d <= e) && esAnioActual(d); };   // dentro del período Y del año actual
+
+/* ==========================================================================
+   CALENDARIO MULTISELECCIÓN (reutilizable)
+   Se usa para los días de descanso y para los de vacaciones. Ambos SIN límite
+   de días: se puede marcar la cantidad que se necesite.
+   Ambos calendarios SOLO trabajan con el año actual: no se puede navegar ni marcar
+   días de otros años. (Las fechas de inicio y final del período sí pueden ser de
+   años anteriores, porque de ellas depende la antigüedad.)
+   ========================================================================== */
+
+// ¿La fecha ("YYYY-MM-DD") pertenece al año actual?
+const esAnioActual = k => pd(k).y === ANIO_ACTUAL;
+
+function Calendario(idCont, idInfo, sel, textoVacio, alCambiar) {
+  const c = {
+    mes: new Date(),   // mes que se está mostrando
+    render() {
+      // Se fuerza el año actual: si el mes guardado era de otro año, se usa el mismo mes pero de este año
+      if (c.mes.getFullYear() !== ANIO_ACTUAL) c.mes = new Date(ANIO_ACTUAL, c.mes.getMonth(), 1);
+      const y = ANIO_ACTUAL, mo = c.mes.getMonth();
+      const primero = new Date(y, mo, 1).getDay();       // día de la semana en que inicia el mes
+      const diasMes = new Date(y, mo + 1, 0).getDate();  // cantidad de días del mes
+
+      // Lista de meses (enero a diciembre) y lista de año con una única opción: el año actual (bloqueada)
+      let optM = '';
+      MN.forEach((n, i) => optM += `<option value="${i}" ${i == mo ? 'selected' : ''}>${n}</option>`);
+
+      // Flechas: la de atrás se apaga en enero y la de adelante en diciembre (no se sale del año)
+      let h = `<div class="ch"><button type="button" data-n="-1" ${mo == 0 ? 'disabled' : ''}>‹</button><span class="sel"><select data-m>${optM}</select><select data-y disabled><option>${y}</option></select></span><button type="button" data-n="1" ${mo == 11 ? 'disabled' : ''}>›</button></div><div class="cg">`
+            + ['D','L','M','M','J','V','S'].map(x => `<i>${x}</i>`).join('');
+      for (let i = 0; i < primero; i++) h += '<span></span>';
+      for (let d = 1; d <= diasMes; d++) {
+        const k = iso(new Date(y, mo, d));
+        // Solo se pueden marcar días dentro del período inicio–fin (y siempre del año actual)
+        h += `<button type="button" data-d="${k}" class="${sel.has(k) ? 'on' : ''}" ${inR(k) ? '' : 'disabled'}>${d}</button>`;
+      }
+      const cont = $(idCont);
+      cont.innerHTML = h + '</div>';
+      cont.querySelectorAll('[data-n]').forEach(b => b.onclick = () => { c.mes = new Date(y, mo + +b.dataset.n, 1); c.render(); });
+      cont.querySelector('[data-m]').onchange = ev => { c.mes = new Date(y, +ev.target.value, 1); c.render(); };
+      cont.querySelectorAll('[data-d]').forEach(b => b.onclick = () => {
+        const k = b.dataset.d;
+        sel.has(k) ? sel.delete(k) : sel.add(k);   // marcar / desmarcar
+        c.render(); alCambiar();
+      });
+
+      // Texto de ayuda debajo del calendario: días marcados, o aviso si el período no toca el año actual
+      const [s, e] = rng();
+      const tocaAnio = !s || !e || (s <= `${y}-12-31` && e >= `${y}-01-01`);
+      const ord = [...sel].sort();
+      $(idInfo).textContent = ord.length
+        ? `Días seleccionados (${ord.length}): ` + ord.map(dmy).join(', ')
+        : (tocaAnio ? textoVacio : `El período no incluye días de ${y}: no hay fechas disponibles.`);
+    }
+  };
+  return c;
+}
+const calDes = Calendario('calDes', 'desSel', D, 'Ningún día seleccionado.', () => calc());
+const calVac = Calendario('calVac', 'vacSel', V, 'Ningún día seleccionado.', () => calc());
+
+/* ---------- Lista de asuetos del AÑO ACTUAL que caen dentro del período ----------
+   ¿Para qué sirve?  Es la lista de casillas que ve el usuario en "Asuetos trabajados".
+   ¿Cómo se arma?  Se toman los asuetos del año actual y se dejan solo los que caen entre la
+     fecha de inicio y la fecha final. Ejemplo: si el trabajador empezó el 01/06/2026 y hoy es
+     octubre de 2026, no aparecen Año Nuevo ni Semana Santa (son anteriores al inicio).
+   Asuetos de otros años NO se muestran. */
+function buildAsu() {
+  const [s, e] = rng(), box = $('asuList');
+  if (!s || !e || e < s) { box.innerHTML = '<span class="note">Indica primero las fechas de inicio y fin.</span>'; return; }
+  const dias = asuetos(ANIO_ACTUAL).filter(([d]) => d >= s && d <= e);   // solo los que caen dentro del período
+  let h = dias.length ? `<div class="head">${ANIO_ACTUAL}</div>` : '';
+  dias.forEach(([d, n]) => h += `<label><input type="checkbox" value="${d}" ${A.has(d) ? 'checked' : ''}> ${dmy(d)} · ${n}</label>`);
+  box.innerHTML = h || `<span class="note">No hay asuetos de ${ANIO_ACTUAL} dentro del período.</span>`;
+  box.querySelectorAll('input').forEach(i => i.onchange = () => { i.checked ? A.add(i.value) : A.delete(i.value); calc(); });
+}
+
+/* ==========================================================================
+   INTERFAZ: muestra/oculta bloques según las respuestas
+   ========================================================================== */
+function ui() {
+  const ren = rv('tipo') == 'renuncia';
+  $('avBox').hidden = !ren;
+
+  // Despido: la fecha final se bloquea y se pone la de hoy. Renuncia: se desbloquea.
+  $('fin').disabled = !ren;
+  if (!ren) $('fin').value = TODAY;
+  $('finL').textContent = ren ? 'Fecha final (fecha de renuncia)' : 'Fecha final (bloqueada: hoy)';
+
+  // Renuncia sin preaviso: se bloquea la prestación
+  const noAviso = ren && rv('aviso') == 'no';
+  $('avWarn').hidden = !noAviso;
+  $('topeBox').hidden = noAviso;
+  $('topeTxt').textContent = m(SALARIO_MIN_COMERCIO);
+
+  $('asuBox').hidden = rv('asu') != 'si';
+  $('desBox').hidden = rv('des') != 'si';
+  $('vacSiBox').hidden = rv('vac') != 'si';
+  $('vacNoBox').hidden = rv('vac') != 'no';
+
+  // Si cambió el período, se descartan las fechas que quedaron fuera de él
+  [A, D, V].forEach(set => [...set].forEach(d => { if (!inR(d)) set.delete(d); }));
+
+  buildAsu(); calDes.render(); calVac.render(); calc();
+}
+
+/* ==========================================================================
+   CÁLCULO PRINCIPAL
+   ========================================================================== */
+function calc() {
+  const sal = parseFloat($('sal').value) || 0;
+  const tipo = rv('tipo'), s = $('ini').value, e = $('fin').value;
+  const name = $('nom').value.trim() || X, dui = $('dui').value.trim() || X, car = $('car').value.trim() || X;
+  const salTxt = $('sal').value === '' ? X : m(sal);
+  if (!s || !e || e < s) {
+    pintar('<p class="note" style="margin:12px 0">Ingresa una fecha de inicio y una fecha final válidas para ver el cálculo.</p>');
+    R = null; return;
+  }
+
+  /* ==================== BASE: TIEMPO DE SERVICIO Y SALARIO DIARIO ====================
+     Estos 5 valores se calculan primero porque TODAS las fórmulas siguientes los usan.
+
+     tot = DÍAS TOTALES trabajados (método 30/360, ver d360).
+           Se obtiene con d360(fecha_inicio, fecha_final).
+     yrs = AÑOS COMPLETOS trabajados.
+           Se obtiene: tot ÷ 360, sin decimales (se redondea hacia abajo).
+           Sirve para: saber si cumplió los 2 años que exige la renuncia, y qué días de aguinaldo le tocan.
+     rem = DÍAS SOBRANTES después de los años completos.
+           Se obtiene: el resto de dividir tot ÷ 360 (de 0 a 359).
+           Sirve para: calcular la parte proporcional de las vacaciones.
+     yf  = AÑOS CON DECIMALES.
+           Se obtiene: tot ÷ 360.  Ej.: 2 años y medio = 2.5
+           Sirve para: multiplicar la indemnización/prestación por "años trabajados" incluyendo
+           los meses y días sueltos, de forma proporcional.
+     sbd = SALARIO BÁSICO DIARIO (lo que gana por un día).
+           Se obtiene: salario mensual ÷ 30.   Ej.: $600 ÷ 30 = $20.00
+           Sirve para: pagar días sueltos (asuetos, descansos, vacaciones, aguinaldo).
+
+     Ejemplo completo: inicio 15/03/2022, fin 20/10/2026, salario $600
+       tot = 1,656 días · yrs = 1,656 ÷ 360 = 4 años · rem = 1,656 − 1,440 = 216 días
+       yf  = 1,656 ÷ 360 = 4.6 años · sbd = 600 ÷ 30 = $20.00
+       (216 días = 7 meses y 6 días, que es lo que se muestra como "4 año(s) y 7 mes(es) 6 día(s)") */
+  // #Fórmula 2: Años de servicio:
+  //   años completos (yrs) = días de servicio (tot) ÷ 360, sin decimales
+  //   días sobrantes (rem) = días de servicio (tot) − (años completos × 360)
+  //   años con decimales (yf) = días de servicio (tot) ÷ 360
+  // #Fórmula 3: Salario básico diario (SBD): salario mensual (sal) ÷ 30 días
+  const sbd = sal / 30, tot = d360(s, e), yrs = Math.floor(tot / 360), rem = tot % 360, yf = tot / 360;
+  const tm = `${yrs} año(s) y ${Math.floor(rem / 30)} mes(es) ${rem % 30} día(s)`;
+
+  const rows = [];
+  const add = (t, sub, v, neg) => rows.push({t, sub, v, neg});   // v = null -> fila solo informativa
+
+  /* ==================== 1) INDEMNIZACIÓN (despido) / PRESTACIÓN (renuncia) ====================
+     ¿Qué es?  El pago principal de la liquidación por los años que trabajó la persona.
+     ¿Para qué sirve?  Compensar al trabajador por el tiempo de servicio. El monto depende de
+       cómo terminó la relación laboral (despido o renuncia).
+
+     PASO PREVIO: el SALARIO TOPE ("cap").
+       cap = el menor entre (salario real) y (4 × salario mínimo de comercio = $1,635.20).
+       Para qué sirve: la ley no permite calcular este pago sobre salarios más altos que el tope.
+       Ejemplos: gana $600   → cap = $600.00   (no llega al tope, se usa su salario)
+                 gana $2,000 → cap = $1,635.20 (pasa el tope, se recorta) */
+  // #Fórmula 4: Salario tope: mínimo entre [salario mensual real (sal)] y [4 (TOPE_VECES_MINIMO) × salario mínimo de comercio (SALARIO_MIN_COMERCIO)]
+  const cap = Math.min(sal, TOPE_VECES_MINIMO * SALARIO_MIN_COMERCIO);
+  let ind = 0, indT, indS;
+  if (tipo == 'despido') {
+    /* --- DESPIDO INJUSTIFICADO ---
+       Fórmula:  indemnización = salario_tope × años_con_decimales          (cap × yf)
+       En palabras: 1 mes de salario por cada año trabajado; los meses y días sueltos
+         cuentan de forma proporcional gracias a los decimales de yf.
+       Mínimo garantizado: aunque haya trabajado muy poco, se paga al menos medio mes de
+         salario (15 días): Math.max(cap × yf, cap ÷ 2) escoge el mayor de los dos.
+       Ejemplo: cap $600 y 4.6 años → 600 × 4.6 = $2,760.00
+       Ejemplo (poco tiempo): cap $600 y 1 mes (yf = 0.0833) → 600 × 0.0833 = $50, pero el mínimo
+         es 600 ÷ 2 = $300 → se paga $300.00 */
+    // #Fórmula 5: Indemnización por despido injustificado: salario tope (cap) × años con decimales (yf)
+    //   · con un mínimo garantizado de: salario tope (cap) ÷ 2 = 15 días de salario
+    ind = Math.max(cap * yf, cap / 2);
+    indT = 'Indemnización por despido injustificado';
+    indS = `Salario tope ${m(cap)} (máx. 4 × mín.) × ${yf.toFixed(4)} años · mínimo 15 días`;
+  } else if (rv('aviso') == 'no') {
+    // RENUNCIA SIN PREAVISO: no tiene derecho a la prestación, el monto queda en $0 (fórmula bloqueada).
+    indT = 'Prestación por renuncia voluntaria';
+    indS = 'Sin preaviso: sin derecho (bloqueada)';
+  } else if (yrs < 2) {
+    // RENUNCIA CON PREAVISO pero con menos de 2 años completos: no cumple el requisito, queda en $0.
+    indT = 'Prestación por renuncia voluntaria';
+    indS = 'Requiere mínimo 2 años de servicio continuo';
+  } else {
+    /* --- RENUNCIA VOLUNTARIA CON PREAVISO (y 2 años o más) ---
+       Fórmula:  prestación = (salario_tope ÷ 30) × 15 días × años_con_decimales
+       En palabras: se paga la mitad de un mes (15 días de salario) por cada año trabajado.
+         · salario_tope ÷ 30 = lo que vale un día con el tope aplicado
+         · × 15 = el valor de 15 días de salario
+         · × yf = por cada año trabajado (con proporcional de meses y días)
+       Ejemplo: cap $600 y 4.6 años → (600 ÷ 30) × 15 × 4.6 = 20 × 15 × 4.6 = $1,380.00 */
+    // #Fórmula 6: Prestación por renuncia voluntaria: (salario tope (cap) ÷ 30 = valor de un día con tope) × 15 (días por año trabajado) × años con decimales (yf)
+    ind = cap / 30 * 15 * yf;
+    indT = 'Prestación económica por renuncia voluntaria';
+    indS = `(${m(cap)} tope 4 × mín. / 30) × 15 días × ${yf.toFixed(4)} años`;
+  }
+  add(indT, indS, ind);
+
+  /* ==================== 2) VACACIONES ====================
+     ¿Qué es?  El pago de las vacaciones que el trabajador todavía no ha disfrutado.
+     ¿Para qué sirve?  Cada año trabajado da derecho a 15 días de vacaciones pagadas con un
+       recargo del 30 % (por eso el × 1.30). Si al terminar la relación laboral quedaron
+       vacaciones sin tomar, se pagan en dinero.
+
+     Paso 1 - FRACCIÓN DE AÑO ("frac"): cuánta parte de las vacaciones se debe.
+       · Si YA recibió sus vacaciones:  frac = rem ÷ 360
+           Solo se paga la parte del año que va corriendo (los días después del último
+           aniversario). Ej.: rem = 216 días → 216 ÷ 360 = 0.6
+       · Si NO las recibió:             frac = 1 + rem ÷ 360     (el "1" solo si ya cumplió 1 año)
+           Se debe el año completo que quedó pendiente + la parte proporcional.
+           Ej.: 1 + 0.6 = 1.6
+
+     Paso 2 - VACACIÓN BASE ("vacBase") = salario_diario × 15 días × frac
+           Es el valor de las vacaciones SIN el recargo.
+           Ej.: sbd $20 × 15 × 0.6 = $180.00   (si no las recibió: 20 × 15 × 1.6 = $480.00)
+
+     Paso 3 - PAGO FINAL = vacBase × 1.30   (suma el 30 % de recargo)
+           Ej.: $180 × 1.30 = $234.00         (si no las recibió: $480 × 1.30 = $624.00) */
+  const recibio = rv('vac') == 'si';
+  // #Fórmula 7: Fracción de vacaciones (frac):
+  //   si YA las recibió → días sobrantes (rem) ÷ 360
+  //   si NO las recibió → 1 (año completo pendiente, solo si ya cumplió 1 año: yrs ≥ 1) + días sobrantes (rem) ÷ 360
+  const frac = recibio ? rem / 360 : (yrs >= 1 ? 1 : 0) + rem / 360;
+  // #Fórmula 8: Pago de vacaciones: SBD (salario básico diario) × 15 (días de vacaciones por año) × fracción de vacaciones (frac) × 1.30 (valor + 30 % de recargo legal)
+  //   vacBase = SBD × 15 × frac   (vacaciones sin recargo; se reutiliza en las fórmulas 9 y 10)
+  //   el pago final (vacBase × 1.30) se agrega más abajo con add('Vacaciones ...')
+  const vacBase = sbd * 15 * frac;
+  add('Vacaciones ' + (recibio ? 'proporcionales' : 'pendientes'),
+      `SBD ${m(sbd)} × 15 días × ${frac.toFixed(4)} × 1.30`, vacBase * 1.3);
+
+  if (recibio) {
+    // Los días marcados en el calendario son solo informativos: se muestran en el resultado y el PDF.
+    if (V.size) add('Vacaciones ya disfrutadas (informativo)', `${V.size} día(s): ` + [...V].sort().map(dmy).join(', '), null);
+  } else {
+    /* RECARGO POR ALOJAMIENTO Y POR COMIDA (dos apartados independientes)
+       ¿Qué es?  Un 25 % adicional sobre las vacaciones por cada beneficio que la empresa le
+         daba al trabajador (alojamiento y/o comida), porque al salir de vacaciones lo pierde.
+       ¿Cómo se obtiene?  recargo = vacBase × 0.25   (15 días de salario × 0.25, proporcional a frac)
+         Se suma una vez por alojamiento y otra por comida, solo si la respuesta fue "Sí".
+       Ejemplo: vacBase $480 → alojamiento $480 × 0.25 = $120.00 · comida otros $120.00 */
+    // #Fórmula 9: Recargo por alojamiento: SBD × 15 (días de vacaciones) × fracción de vacaciones (frac) × 0.25 (recargo del 25 %)  → vacBase × 0.25
+    if (rv('aloj') == 'si') add('Recargo por alojamiento', '15 días de salario × 0.25', vacBase * .25);
+    // #Fórmula 10: Recargo por alimentación: SBD × 15 (días de vacaciones) × fracción de vacaciones (frac) × 0.25 (recargo del 25 %)  → vacBase × 0.25
+    if (rv('com')  == 'si') add('Recargo por alimentación', '15 días de salario × 0.25', vacBase * .25);
+  }
+
+  /* ==================== 3) AGUINALDO ====================
+     ¿Qué es?  El pago extra de fin de año, proporcional al tiempo trabajado.
+     ¿Para qué sirve?  Si el trabajador sale ANTES de que la empresa pague el aguinaldo, hay
+       que pagarle la parte que ya se ganó. Para esta herramienta, el aguinaldo se paga el
+       2 de octubre ("corte").
+
+     Regla del corte (según la fecha final):
+       · Fecha final ANTES del 2 de octubre → el aguinaldo NO se había pagado → se calcula.
+       · Fecha final el 2 de octubre o DESPUÉS → ya se consideró pagado → $0.00.
+
+     Paso 1 - DÍAS DE AGUINALDO ("diasAg") según los años trabajados:
+         menos de 3 años → 15 días · de 3 a 10 años → 19 días · más de 10 años → 21 días
+     Paso 2 - DÍAS TRANSCURRIDOS ("dd"): días desde el último 2 de octubre hasta la fecha final
+         (o desde la fecha de inicio, si el trabajador entró después de ese 2 de octubre).
+         Nunca más de 360. Se miden con d360().
+     Paso 3 - FÓRMULA:  aguinaldo = salario_diario × diasAg ÷ 360 × dd
+         · salario_diario × diasAg = lo que vale el aguinaldo de un año completo
+         · ÷ 360 × dd = la parte proporcional a los días que van corridos del año
+
+     Ejemplo: sbd $20, 19 días, final 20/09/2026 → desde 02/10/2025 son 349 días
+         20 × 19 ÷ 360 × 349 = $368.39 */
+  const Y = pd(e).y, corte = `${Y}-10-02`;
+  // #Fórmula 11: Días de aguinaldo según antigüedad (diasAg): años completos (yrs) menor a 3 → 15 días · de 3 a 10 años → 19 días · más de 10 años → 21 días
+  const diasAg = yrs < 3 ? 15 : (yrs <= 10 ? 19 : 21);
+  if (e < corte) {
+    let desde = `${Y - 1}-10-02`;
+    if (desde < s) desde = s;
+    const dd = Math.min(d360(desde, e), 360);
+    // #Fórmula 12: Aguinaldo proporcional: SBD (salario básico diario) × días de aguinaldo (diasAg, fórmula 11) ÷ 360 (días del año comercial) × días transcurridos (dd: desde el último 2 de octubre, o desde el inicio, hasta la fecha final)
+    add('Aguinaldo proporcional (no pagado)', `SBD × ${diasAg} días / 360 × ${dd} días (desde ${dmy(desde)})`, sbd * diasAg / 360 * dd);
+  } else {
+    add('Aguinaldo', 'Fecha final posterior al 2 de octubre: considerado pagado', 0);
+  }
+
+  /* ==================== 4) ASUETOS Y DESCANSOS TRABAJADOS ====================
+     ¿Qué es?  El pago de días en que el trabajador debía descansar (asueto o descanso
+       semanal) pero trabajó y no se le pagó.
+     ¿Para qué sirve?  Esos días valen más que un día normal, así que se cobran con recargo.
+
+     Regla para no pagar doble: si un día de descanso trabajado coincide con un asueto, se
+       paga UNA sola vez, como asueto (no se suman los dos pagos).
+     Si el usuario contestó "No" en una sección, sus fechas marcadas se ignoran. */
+  const descSel = rv('des') == 'si' ? [...D].filter(inR) : [];
+  const asueSel = rv('asu') == 'si' ? [...A].filter(inR) : [];
+  // Descansos que coinciden con un asueto: se mueven al pago de asueto (sin duplicar).
+  const coinciden = descSel.filter(esAsueto);
+  const asuDias   = [...new Set([...asueSel, ...coinciden])];       // asuetos a pagar (sin repetir)
+  const desDias   = descSel.filter(d => !esAsueto(d));              // descansos a pagar
+
+  /* ASUETO TRABAJADO: se paga el día DOBLE (el día normal + 100 % de recargo).
+       Fórmula:  pago = salario_diario × 2 × cantidad_de_asuetos_trabajados
+       Ejemplo: sbd $20 → cada asueto vale 20 × 2 = $40 · 3 asuetos = $120.00 */
+  // #Fórmula 13: Pago de asuetos trabajados: cantidad de asuetos trabajados (asuDias.length) × SBD (salario básico diario) × 2 (día doble: valor del día + 100 % de recargo)
+  const asP = asuDias.length * sbd * 2;
+  /* DESCANSO SEMANAL TRABAJADO Y NO PAGADO: se paga el día con 50 % de recargo (× 1.5).
+       Fórmula:  pago = salario_diario × 1.5 × cantidad_de_descansos_trabajados
+       Ejemplo: sbd $20 → cada descanso vale 20 × 1.5 = $30 · 4 descansos = $120.00 */
+  // #Fórmula 14: Pago de descansos trabajados: cantidad de descansos trabajados (desDias.length) × SBD (salario básico diario) × 1.5 (valor del día + 50 % de recargo)
+  const deP = desDias.length * sbd * 1.5;
+  if (asuDias.length) add('Asuetos trabajados', `SBD × 2 × ${asuDias.length} día(s)` + (coinciden.length ? ` · incluye ${coinciden.length} descanso(s) que coincide(n) con asueto (se paga solo una vez)` : ''), asP);
+  if (desDias.length) add('Descansos trabajados no pagados', `SBD × 1.5 × ${desDias.length} día(s)`, deP);
+
+  /* ==================== 5) TOTAL BRUTO ====================
+     ¿Qué es?  El total de la liquidación ANTES de descontar ISSS y AFP.
+     ¿Cómo se obtiene?  Suma de todos los conceptos anteriores: indemnización o prestación +
+       vacaciones (+ recargos) + aguinaldo + asuetos + descansos.
+       Las filas "informativas" (v = null, como los días de vacaciones ya disfrutados) no suman. */
+  // #Fórmula 15: Total bruto: indemnización o prestación (5 ó 6) + vacaciones (8) + recargos (9, 10) + aguinaldo (12) + asuetos (13) + descansos (14)
+  const gross = rows.reduce((t, r) => t + (r.v || 0), 0);
+
+  /* ==================== 6) DEDUCCIONES DE LEY Y TOTAL NETO ====================
+     ¿Qué son?  Los descuentos obligatorios que se le restan al total bruto.
+     ¿Para qué sirven?  Para saber cuánto dinero recibe realmente el trabajador (el neto).
+
+     ISSS (seguro social) = 3 % del total, pero el total solo cuenta hasta $1,000
+         Fórmula: mínimo(total, 1000) × 0.03
+         Ejemplos: total $3,000 → mínimo(3000, 1000) = 1000 → × 0.03 = $30.00
+                   total   $800 → mínimo(800, 1000)  = 800  → × 0.03 = $24.00
+     AFP (pensiones) = 7.25 % del total completo, SIN tope
+         Fórmula: total × 0.0725
+         Ejemplos: total $3,000 → $217.50 · total $800 → $58.00
+     TOTAL NETO = total bruto − ISSS − AFP
+         Ejemplo: $3,000 − $30.00 − $217.50 = $2,752.50 */
+  // #Fórmula 16: Descuento ISSS: mínimo entre [total bruto (gross)] y [$1,000 (ISSS_TOPE)] × 0.03 (ISSS_TASA = 3 %)
+  const isss = Math.min(gross, ISSS_TOPE) * ISSS_TASA;
+  // #Fórmula 17: Descuento AFP: total bruto (gross) × 0.0725 (AFP_TASA = 7.25 %, sin tope)
+  const afp  = gross * AFP_TASA;
+  // #Fórmula 18: Total neto a recibir: total bruto (gross) − descuento ISSS (isss) − descuento AFP (afp)
+  const net  = gross - isss - afp;
+
+  R = {name, dui, car, salTxt, t: tipo, s, e, tm, rows, gross, isss, afp, net};
+
+  /* ---------- Pintar el resultado ---------- */
+  const row = x => `<div class="row ${x.neg ? 'neg' : ''}"><div>${x.t}<small>${x.sub}</small></div><b>${x.v === null ? 'informativo' : (x.neg ? '− ' : '') + m(x.v)}</b></div>`;
+  pintar(`<div class="head">Datos</div><div class="row"><div>${name}<small>DUI ${dui} · Cargo ${car} · Salario ${salTxt}</small></div></div>
+ <div class="row"><div>${tipo == 'despido' ? 'Despido injustificado' : 'Renuncia voluntaria (' + (rv('aviso') == 'si' ? 'con' : 'sin') + ' preaviso)'}<small>${dmy(s)} al ${dmy(e)} · ${tm}</small></div></div>
+ <div class="head">Prestaciones</div>${rows.map(row).join('')}
+ <div class="total"><span>Total bruto</span><span>${m(gross)}</span></div>
+ <div class="head">Deducciones de ley</div>
+ ${row({t: 'ISSS 3%', sub: `Base tope ${m(Math.min(gross, ISSS_TOPE))} (máx. $1,000)`, v: isss, neg: 1})}${row({t: 'AFP 7.25%', sub: `Sobre ${m(gross)}`, v: afp, neg: 1})}
+ <div class="total net"><span>Total neto a recibir</span><span>${m(net)}</span></div>
+ <p class="note">Cálculo con meses de 30 días y año de 360 días. Las deducciones se aplican sobre el total, según lo indicado. Herramienta orientativa, no sustituye asesoría legal.</p>`);
+}
+
+/* El mismo resultado se muestra en dos lugares: la ventana flotante y la página aparte */
+function pintar(html) {
+  $('resPage').innerHTML = html;
+  $('resModal').innerHTML = html;
+}
+
+/* ==========================================================================
+   EXPORTAR A PDF
+   ========================================================================== */
+async function pdf() {
+  if (!R) return;
+  const {jsPDF} = window.jspdf;
+  const d = new jsPDF();
+  let y = 18;
+  // ln: escribe una línea de texto (y un valor alineado a la derecha) y salta de página si hace falta
+  const ln = (t, sz = 10, b = false, v) => {
+    if (y > 280) { d.addPage(); y = 18; }
+    d.setFont('helvetica', b ? 'bold' : 'normal'); d.setFontSize(sz);
+    d.text(String(t), 15, y);
+    if (v !== undefined) d.text(v, 195, y, {align: 'right'});
+    y += sz * 0.6 + 2;
+  };
+  ln('Liquidación laboral - El Salvador', 16, true); y += 3;
+  ln('Nombre: ' + R.name); ln('DUI: ' + R.dui); ln('Cargo: ' + R.car); ln('Último salario mensual: ' + R.salTxt);
+  ln('Terminación: ' + (R.t == 'despido' ? 'Despido injustificado' : 'Renuncia voluntaria'));
+  ln(`Período: ${dmy(R.s)} al ${dmy(R.e)} (${R.tm})`); y += 4;
+  R.rows.forEach(r => {
+    ln(r.t, 10, true, r.v === null ? 'informativo' : m(r.v));
+    d.setTextColor(110); d.splitTextToSize(r.sub, 150).forEach(l => ln(l, 8)); d.setTextColor(0);
+  });
+  y += 3;
+  ln('Total bruto', 11, true, m(R.gross));
+  ln('ISSS 3% (tope base $1,000)', 10, false, '- ' + m(R.isss));
+  ln('AFP 7.25%', 10, false, '- ' + m(R.afp));
+  ln('Total neto a recibir', 12, true, m(R.net));
+  const blob = d.output('blob'), fn = 'liquidacion_laboral.pdf';
+  try {
+    const dl = window.claude && await window.claude.use('downloads');
+    if (dl) { await dl.save({filename: fn, data: blob}); return; }
+  } catch (err) { if (err && err.code == 'declined') return; }
+  d.save(fn);
+}
+document.querySelectorAll('.btnPdf').forEach(b => b.onclick = pdf);
+
+/* ==========================================================================
+   NAVEGACIÓN: ventana flotante y página de resultados
+   ========================================================================== */
+const abrirModal  = () => { $('ov').hidden = false; document.body.style.overflow = 'hidden'; };
+const cerrarModal = () => { $('ov').hidden = true;  document.body.style.overflow = ''; };
+
+// Página 1 (formulario) o página 2 (resultados). Se usa el hash de la URL (#resultados)
+// para que el botón "atrás" del navegador también regrese al formulario.
+function vista() {
+  const res = location.hash == '#resultados';
+  $('vistaForm').hidden = res;
+  $('vistaRes').hidden = !res;
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', vista);
+
+$('btnCalc').onclick   = () => { calc(); abrirModal(); };                        // Calcular -> abre la ventana flotante
+$('btnX').onclick      = cerrarModal;                                            // Cerrar con la X
+$('btnCerrar').onclick = cerrarModal;                                            // "Solo ver": cierra sin descargar
+$('ov').addEventListener('click', ev => { if (ev.target == $('ov')) cerrarModal(); });   // clic fuera de la ventana
+document.addEventListener('keydown', ev => { if (ev.key == 'Escape') cerrarModal(); });  // tecla Esc
+$('btnPagina').onclick = () => { cerrarModal(); location.hash = 'resultados'; };         // Abrir en página aparte
+$('btnVolver').onclick = () => { location.hash = ''; };                                  // Volver al formulario
+
+/* ==========================================================================
+   EVENTOS
+   ========================================================================== */
+/* ---------- Filtros de escritura de los datos generales ----------
+   ¿Para qué sirven?  Cada campo solo acepta los caracteres que le corresponden; lo demás se borra
+     al instante, ya sea que el usuario lo escriba o lo pegue. Cada filtro recibe el texto
+     escrito y devuelve el texto "limpio".
+   Los campos vacíos siguen permitidos (se muestran como xxxxxxxxxxxxxxxx en el resultado). */
+const FILTROS = {
+  // NOMBRE: solo letras (con tildes, ñ, ü), espacios, apóstrofo, punto y guion (ej. "María de los Ángeles O'Connor-Pérez").
+  //   1) quita todo lo que no sea letra/espacio/'/./-   2) quita espacios al inicio   3) junta espacios repetidos
+  nom: v => v.replace(/[^\p{L}\s'.\-]/gu, '').replace(/^\s+/, '').replace(/\s{2,}/g, ' '),
+
+  // CARGO: letras y números (ej. "Supervisor 2"), espacios y los signos . , - / ( ) &
+  car: v => v.replace(/[^\p{L}\d\s.,\-\/()&]/gu, '').replace(/^\s+/, '').replace(/\s{2,}/g, ' '),
+
+  // DUI: solo números, máximo 9. El guion se pone solo ANTES del último dígito (formato 00000000-0):
+  //   1) quita todo lo que no sea número   2) corta a 9 dígitos
+  //   3) si ya hay un 9.º dígito, inserta el guion después del 8.º.
+  //   (Con 8 dígitos NO se muestra el guion, así se puede borrar con normalidad sin que reaparezca.)
+  dui: v => { const d = v.replace(/\D/g, '').slice(0, 9); return d.length > 8 ? d.slice(0, 8) + '-' + d.slice(8) : d; },
+
+  // SALARIO: solo números y un punto decimal, con máximo 2 decimales y 7 dígitos enteros.
+  //   · La coma se convierte en punto (teclados que usan coma decimal).
+  //   · Si empieza con punto, se completa como "0." (ej. ".5" -> "0.5").
+  sal: v => {
+    const t = v.replace(/,/g, '.').replace(/[^\d.]/g, '');
+    const i = t.indexOf('.');
+    const ent = (i < 0 ? t : t.slice(0, i)).slice(0, 7);                 // parte entera
+    if (i < 0) return ent;
+    return (ent || '0') + '.' + t.slice(i + 1).replace(/\./g, '').slice(0, 2);   // parte decimal (máx. 2)
+  }
+};
+
+// Aplica el filtro de cada campo al escribir o pegar, conservando la posición del cursor.
+// Se registra ANTES del recálculo, para que el cálculo use siempre el texto ya limpio.
+Object.keys(FILTROS).forEach(id => $(id).addEventListener('input', () => {
+  const el = $(id), antes = el.value, pos = el.selectionStart;
+  const limpio = FILTROS[id](antes);
+  if (limpio !== antes) {
+    el.value = limpio;
+    const p = Math.max(0, Math.min(limpio.length, pos + limpio.length - antes.length));
+    el.setSelectionRange(p, p);
+  }
+}));
+
+// Recalcular al escribir en los datos generales
+['sal', 'nom', 'dui', 'car'].forEach(i => $(i).addEventListener('input', calc));
+
+// Al cambiar las fechas: los calendarios saltan al mes de la fecha final y se refresca todo
+['ini', 'fin'].forEach(i => $(i).addEventListener('change', () => {
+  if ($('fin').value) {
+    const f = pd($('fin').value);
+    calDes.mes = new Date(f.y, f.m - 1, 1);
+    calVac.mes = new Date(f.y, f.m - 1, 1);
+  }
+  ui();
+}));
+
+// Cualquier cambio en un radio (tipo, aviso, asueto, descanso, vacaciones...) actualiza la interfaz
+document.querySelectorAll('input[type=radio]').forEach(r => r.addEventListener('change', ui));
+
+$('fin').value = TODAY;
+ui();
+if (location.hash) history.replaceState(null, '', location.pathname);   // al recargar siempre se empieza en el formulario
+vista();
+</script>
+</body>
+</html>
